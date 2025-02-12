@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .transaction-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form -group {
+            margin-bottom: 15px;
+
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-cash-in {
+            background-color: #4acf50;
+            color: white;
+        }
+
+        .btn-cash-out {
+            background-color: #f44336;
+            color: white;
+        }
+
+
+        .transaction.history {
+            margin-top: 30px;
+        }
+
+
+        .balance {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="transaction-container">
+        <h1>Cash Management</h1>
+        <div class="balance" id="balance">Current Balance: $0.00</div>
+
+        <div class="form-group">
+            <label for="amount">Amount ($):</label>
+            <input type="number" id="amount" step="0.01" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" id="description" required>
+        </div>
+
+        <div class="btn-group">
+            <button onclick="handleTransaction('in')" class="btn btn-cash-in">Cash In</button>
+            <button onclick="handleTransaction('out')" class="btn btn-cash-out">Cash Out</button>
+        </div>
+
+        <div class="transaction-history">
+            <h2>Transaction History</h2>
+            <ul id="transactions"></ul>
+        </div>
+    </div>
+
+    <script>
+        let balance = 0;
+        const transactions = [];
+
+        function handleTransaction(type) {
+            const amountInput = document.getElementById('amount');
+            const descriptionInput = document.getElementById('description');
+
+            const amount = parseFloat(amountInput.value);
+            const description = descriptionInput.value;
+
+            if (!amount || !description) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (type === 'out' && amount > balance) {
+                alert('Insufficient funds!');
+                return;
+            }
+
+            const transaction = {
+                type,
+                amount,
+                description,
+                date: new Date().toLocaleString()
+            };
+
+            balance += type === 'in' ? amount : -amount;
+            transactions.unshift(transaction);
+
+            updateUI();
+            resetForm();
+        }
+
+        function updateUI() {
+            // Update balance
+            document.getElementById('balance').textContent = `Current Balance: $${balance.toFixed(2)}`;
+
+            // Update transaction history
+            const transactionsList = document.getElementById('transactions');
+            transactionsList.innerHTML = transactions.map(t => `
+                <li style="margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee;">
+                    <strong>${t.type === 'in' ? 'Cash In' : 'Cash Out'}</strong> - $${t.amount.toFixed(2)}<br>
+                    ${t.description}<br>
+                    <small>${t.date}</small>
+                </li>
+            `).join('');
+        }
+
+
+
+
+        function resetForm() {
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+        }
+
+
+
+    </script>
+
+</body>
+
+</html>
